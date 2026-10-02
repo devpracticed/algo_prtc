@@ -1,59 +1,42 @@
 #!/usr/local/bin/python3
 
-def is_palindrome(s: str, start: int, end: int):
-    if start == end:
+
+def _is_palindrome(sStr: str):
+    if not sStr:
+        return False
+    
+    if sStr == sStr[::-1]:
         return True
-    elif start >= end:
-        return False
-    elif s[start] != s[end]:
-        return False
     else:
-        if start + 1 == end:
-            return True
+        return False
+
+def _palin_sub_recurse(sStr: str, sidx: int, eidx: int):
+    if not sStr or len(sStr) == 0:
+        return
+    
+    if sidx >= eidx:
+        return
+
+    if len(sStr) == 1:
+        return sStr
+    
+    subStr = sStr[sidx:eidx]
+    print(f"sStr: {sStr} : sidx: {sidx} : eidx: {eidx} : len: {len(sStr)} : subStr: {subStr}")
+
+    if _is_palindrome(subStr):
+        return subStr
+    else:
+        if eidx - sidx < 3:
+            return ""
+        fs = _palin_sub_recurse(sStr, sidx+1, eidx) 
+        ss = _palin_sub_recurse(sStr, sidx, eidx-1)
+        if len(fs) >= len(ss):
+            return fs
         else:
-            return is_palindrome(s, start + 1, end - 1)
+            return ss
 
 
-def longest_palindromic_substring_memo(s: str) -> str:
-    if len(s) < 2:
-        return s
-
-    if len(s) == 2:
-        return s if s[0] == s[1] else s[0]
-
-    memo = [ [ None for j in range(0, len(s)) ] for i in range(0, len(s)) ]
-    for i in range(0, len(s)):
-        memo[i][i] = s[i]
-
-    max_palindrome = ""
-    for i in range(0, len(s)):
-        for j in range(len(s) - 1, i, -1):
-            if memo[i][j] != None:
-                max_palindrome = max(max_palindrome, memo[i][j])
-            elif is_palindrome(s, i, j):
-                memo[i][j] = s[i:j + 1]
-                max_palindrome = max(max_palindrome, memo[i][j])
-
-    return max_palindrome
-
-
-def longest_palindromic_substring_brute(s: str) -> str:
-    if len(s) < 2:
-        return s
-
-    if len(s) == 2:
-        return s if s[0] == s[1] else s[0]
-
-    max_palindrome = ""
-
-    for i in range(0, len(s)):
-        for j in range(len(s) - 1, i, -1):
-            if is_palindrome(s, i, j):
-                max_palindrome = max(max_palindrome, s[i:j + 1])
-
-    return max_palindrome
-
-def run():
+def longest_palindromic_substring(aStr: str):
     """
     https://leetcode.com/problems/longest-palindromic-substring/
 
@@ -61,13 +44,30 @@ def run():
     Space:
     Note :
     """
-    print(longest_palindromic_substring_brute("babad"))
-    print(longest_palindromic_substring_brute("cbbd"))
+    if not aStr:
+        return 0
+    if len(aStr) < 2:
+        return aStr
 
-    print(longest_palindromic_substring_memo("babad"))
-    print(longest_palindromic_substring_memo("cbbd"))
+    start_idx = 0 
+    end_idx = len(aStr)
 
+    return _palin_sub_recurse(aStr, start_idx, end_idx)
 
+def run():
+    # test_cases = ["", "a", "ab", "aa", "aba", "atba", "aaaa", "babad", "cbbd", "abcd", "a11a", "jhasdjhas", "abababccb", "abababccba", "abababccbaz"]
+    
+    # simple
+    # test_cases = ["", "a", "ab", "aa", "bb", "aba"]
+    
+    # more 
+    # test_cases = ["atba", "aaaa", "babad", "cbbd"]
+
+    test_cases = ["babaddtattarrattatddetartrateedredividerb"]
+    for t in test_cases:
+        print(longest_palindromic_substring(t))
+        print("-----------")
 
 if __name__ == '__main__':
     run()
+
